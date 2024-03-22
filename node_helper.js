@@ -91,8 +91,8 @@ module.exports = NodeHelper.create({
         var opt = {
             uri: uri,
             headers: {
-                'Content-Type: application/json',
-                'accept: application/json'
+                'Content-Type' : 'application/json',
+                'accept' : 'application/json'
             },
             json: true
         };
