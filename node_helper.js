@@ -93,7 +93,7 @@ module.exports = NodeHelper.create({
             headers: {
                 'Content-Type: application/json',
                 'accept: application/json'
-            }
+            },
             json: true
         };
 
