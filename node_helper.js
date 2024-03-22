@@ -82,24 +82,20 @@ module.exports = NodeHelper.create({
         log('Getting departures for station id ' + station.stationId);
         var self = this;
 
-        // http://api.sl.se/api2/realtimedeparturesV4.<FORMAT>?key=<DIN API NYCKEL>&siteid=<SITEID>&timewindow=<TIMEWINDOW>
-        var transport = (this.config.SSL ? 'https' : 'http');
+        // Use Trafiklab API SL Transport
+        // curl -X 'GET'   
+        uri = 'https://transport.integration.sl.se/v1/sites/' + station.stationId + '/departures?forecast=' + station.forecast;
+        if (station.direction !== undefined) {
+            uri = uri + '&direction='+station.direction;
+        }
         var opt = {
-            uri: transport + '://api.sl.se/api2/realtimedeparturesV4.json',
-            qs: {
-                key: this.config.apikey,
-                siteid: station.stationId,
-                timewindow: 60
-            },
+            uri: uri,
+            headers: {
+                'Content-Type: application/json',
+                'accept: application/json'
+            }
             json: true
         };
-
-        // Exclude those types of rides that you are not interested in
-        if (station.excludeTransportTypes !== undefined && Array.isArray(station.excludeTransportTypes)) {
-            for (var ix = 0; ix < station.excludeTransportTypes.length; ix++) {
-                opt.qs[station.excludeTransportTypes[ix]] = false
-            }
-        }
 
         if (this.config.proxy !== undefined) {
             opt.agent = new HttpsProxyAgent(Url.parse(this.config.proxy));
