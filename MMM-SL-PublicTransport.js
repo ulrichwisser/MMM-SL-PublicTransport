@@ -124,11 +124,6 @@ Module.register("MMM-SL-PublicTransport", {
     // --------------------------------------- Generate dom for module
     getDom: function () {
         var wrapper = document.createElement("div");
-        if (this.config.apikey === "" || this.config.apikey === 'PleaseProvideYourOwn') {
-            wrapper.innerHTML = this.name + ": Please set API key in config.js.";
-            wrapper.className = "dimmed light small";
-            return wrapper;
-        }
         if (!this.loaded) {
             wrapper.innerHTML = "Loading connections ...";
             wrapper.className = "dimmed light small";
