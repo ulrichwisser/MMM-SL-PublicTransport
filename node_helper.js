@@ -83,7 +83,7 @@ module.exports = NodeHelper.create({
         var self = this;
 
         // Use Trafiklab API SL Transport
-        // curl -X 'GET'   
+        // e.g. curl -X 'GET' 'https://transport.integration.sl.se/v1/sites/2322/departures?forecast=60&direction=2' -H 'accept: application/json' -H 'Content-Type: application/json'
         uri = 'https://transport.integration.sl.se/v1/sites/' + station.stationId + '/departures?forecast=' + station.forecast;
         if (station.direction !== undefined) {
             uri = uri + '&direction='+station.direction;
@@ -94,59 +94,48 @@ module.exports = NodeHelper.create({
                 'Content-Type' : 'application/json',
                 'accept' : 'application/json'
             },
-            json: true
+            json: true,
+            resolveWithFullResponse: true
         };
+
 
         if (this.config.proxy !== undefined) {
             opt.agent = new HttpsProxyAgent(Url.parse(this.config.proxy));
             debug('SL-PublicTransport: Using proxy ' + this.config.proxy);
         }
         debug('SL-PublicTransport: station id ' + station.stationId + ' Calling ' + opt.uri);
-        console.log(opt);
         request(opt)
             .then(function (resp) {
-                if (resp.StatusCode == 0) {
-                    //console.log(resp);
-                    var CurrentDepartures = {};
+                if (resp.statusCode == 200) {
+
+                    // build array of departures by direction
                     var departures = [];
+                    self.addDepartures(station, departures, resp.body.departures);
+
+                    // build our answer object
+                    var CurrentDepartures = {};
                     CurrentDepartures.StationId = station.stationId;
                     CurrentDepartures.StationName = (station.stationName === undefined ? 'NotSet' : station.stationName);
-                    CurrentDepartures.LatestUpdate = resp.ResponseData.LatestUpdate; // Anger när realtidsinformationen (DPS) senast uppdaterades.
-                    CurrentDepartures.DataAge = resp.ResponseData.DataAge; //Antal sekunder sedan tidsstämpeln LatestUpdate.
-                    CurrentDepartures.obtained = new Date(); //When we got it.
-                    self.addDepartures(station, departures, resp.ResponseData.Metros);
-                    self.addDepartures(station, departures, resp.ResponseData.Buses);
-                    self.addDepartures(station, departures, resp.ResponseData.Trains);
-                    self.addDepartures(station, departures, resp.ResponseData.Trams);
-                    self.addDepartures(station, departures, resp.ResponseData.Ships);
-                    //console.log(self.departures);
+                    CurrentDepartures.obtained = new Date(); // When we got it.
+                    CurrentDepartures.LatestUpdate = new Date(); // New API doesn't really give us that data, so we use now
+                    CurrentDepartures.departures = [];
 
-                    // Sort on ExpectedDateTime
-                    for (var ix = 0; ix < departures.length; ix++) {
-                        if (departures[ix] !== undefined) {
-                            departures[ix].sort(dynamicSort('ExpectedDateTime'))
-                        }
-                    }
-                    //console.log(departures);
-
-                    // Add the sorted arrays into one array
-                    var temp = []
+                    // Add departures
                     for (var ix = 0; ix < departures.length; ix++) {
                         if (departures[ix] !== undefined) {
                             for (var iy = 0; iy < departures[ix].length; iy++) {
-                                temp.push(departures[ix][iy]);
+                                CurrentDepartures.departures.push(departures[ix][iy]);
                             }
                         }
                     }
-                    //console.log(temp);
 
                     // TODO:Handle resp.ResponseData.StopPointDeviations
-                    CurrentDepartures.departures = temp; 
+
+                    // Done
                     log('Found ' + CurrentDepartures.departures.length + ' DEPARTURES for station id=' + station.stationId);
                     resolve(CurrentDepartures);
-
                 } else {
-                    log('Something went wrong: station id=' + station.stationId + ' StatusCode: ' + resp.StatusCode + ' Msg: ' + resp.Message);
+                    log('Something went wrong: station id=' + station.stationId + ' StatusCode: ' + resp.statusCode + ' Msg: ' + resp.statusMessage);
                     reject(resp);
                 }
             })
@@ -160,7 +149,10 @@ module.exports = NodeHelper.create({
     addDepartures: function (station, departures, depArray) {
         for (var ix = 0; ix < depArray.length; ix++) {
             var element = depArray[ix];
+            console.log(element);
             var dep = new Departure(element);
+            console.log('New dep');
+            console.log(dep);
             //debug("BLine: " + dep.LineNumber);
             dep = this.fixJourneyDirection(station, dep); 
             if (this.isWantedLine(station, dep)) {
@@ -205,16 +197,12 @@ module.exports = NodeHelper.create({
     isWantedLine: function (station, dep) {
         //debug('0 ')
         if (station.lines !== undefined) {
+            console.log(station);
             if (Array.isArray(station.lines)) {
-                //debug('1')
                 for (var il=0; il < station.lines.length; il++) { // Check if this is a line we want
-                    //debug('2 '+ il)
-                    //debug(typeof(dep.LineNumber) === 'string');
-                    //debug(typeof(dep.LineNumber));
                     l1 = (typeof(dep.LineNumber) === 'string' ? dep.LineNumber.toUpperCase() : dep.LineNumber);
                     l2 = (typeof(station.lines[il].line) === 'string' ? station.lines[il].line.toUpperCase() : station.lines[il].line);
                     debug("Lines "+ dep.LineNumber + " checked against "+ station.lines[il].line);
-                    //debug("Lines t "+ typeof(dep.LineNumber) + " checked against t "+ typeof(station.lines[il].line));
                     if (l1 == l2) {
                         debug("Checking line "+ dep.LineNumber + " Dir: " + dep.JourneyDirection)
                         if (station.lines[il].direction !== undefined) {
@@ -236,19 +224,6 @@ module.exports = NodeHelper.create({
         } else {
             return true; // Take all lines on this station
         }
-    },
-
-    // --------------------------------------- Are we asking for this direction
-    isWantedLineXXX: function (line) {
-        if (this.config.lines !== undefined) {
-            if (this.config.lines.length > 0) {
-                for (var ix = 0; ix < this.config.lines.length; ix++) {
-                    // Handle objects in lines
-                    if (line == this.getLineNumber(ix)) return true;
-                }
-            } else return true; // Its defined but does not contain anything = we want all lines
-        } else return true; // Its undefined = we want all lines
-        return false;
     },
 
     // --------------------------------------- Get the line number of a lines entry
