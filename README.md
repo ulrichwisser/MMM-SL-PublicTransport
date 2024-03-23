@@ -3,30 +3,18 @@
 
 ![SL PublicTransport Module](docs/MMM-SL-Screenshot.PNG)
 
-## Get API key
-You need to obtain your own API key's from TrafikLab in order to use this module. 
-API keys are free and are obtained by creating an account and a so-called project at [Trafiklab.se](https://trafiklab.se).
-You need to retrieve keys for the following API's:
-
-* [SL Realtidinformation 4](https://www.trafiklab.se/api/sl-realtidsinformation-4)
-* [SL Platsuppslag](https://www.trafiklab.se/api/sl-platsuppslag)
-
 ## Install
 1. Clone repository into ``../modules/`` inside your MagicMirror folder.
 2. Run ``npm install`` inside ``../modules/MMM-SL-PublicTransport/`` folder
-3. Run ``node findStation.js apiKey stationName`` to find out your Station ID.
-4. Add the module to the MagicMirror config
+3. Add the module to the MagicMirror config
 
 ## Update
 1. Run ``git pull`` inside ``../modules/MMM-SL-PublicTransport/`` folder.
 2. Run ``npm install`` inside ``../modules/MMM-SL-PublicTransport/`` folder
 
 ## Configuration
-**Note**: In release 1.5 there is a major change of the configuration. Please read through carefully and update your configration appropriately. 
-All features present in earlier releases are available but you need to redefine your configuration. The new configuration ``stations`` will 
-allow you to define in more detail what you want to see. For examples see the section [How to use the stations parameter](#how-to-use-the-stations-parameter) below.
+Keep in mind that your configuration should not overly use the Trafiklab API! There is no official quota, but try to be nice!
 
-Keep in mind that your configuration should not exceed the Trafiklab quota of 10.000 API calls per month. You can find more examples on this below 
 ```
 modules: [
     ...
@@ -35,7 +23,6 @@ modules: [
         position: 'top_right',
         header: 'Busses',
         config: {
-            apikey: 'your-api-key',         // REQUIRED.
             stations: [                     // REQUIRED at least one entry. 
                                             // Definition of the stations that you would like to see
               {
@@ -43,9 +30,8 @@ modules: [
                                             // findStation to get the id(s) of the station(s) you want.
                 stationName: 'station-name',// Optional. This is the name of the station.
                                             // It's shown in the header if you have set a header on the module
-                excludeTransportTypes: [],  // Optional. This is an array of types of transport that you DONT 
-                                            // want to see. If not present then all transport types are shown. 
-                                            // The types are: 'Bus', 'Train', 'Metro', 'Tram' and 'Ship'.
+                direction: dir,             // Optional. 1 or 2
+                forecast: 60,               // Optional. Minutes in future for departures to retrieve
                 lines: [                    // Optional. An array of lines that you want to see departing from
                                             // this station.
                   {
