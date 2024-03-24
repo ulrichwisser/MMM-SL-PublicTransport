@@ -235,38 +235,18 @@ Note that if DisplayTime is used there is (currently) no update of that value be
 
 
 ## Find stationid
-You need to set a stationid in the configuration and to find that run the following helper
 
-```node findStation.js apikey searchstring```
+With the new SL Translport API no api key is needed. There is a call to get the list of all stations
 
-where ``apikey`` is your API key for the SL Platsuppslag API and ``searchstring`` is the name of the station.
+```curl -X 'GET'   'https://transport.integration.sl.se/v1/sites?expand=false'   -H 'accept: application/json'   -H 'Accept-Encoding: identity' -H 'Content-Type: application/json'```
 
-__NOTE__: This API key is not the same as the API key for "SL Realtidinformation 4" API that you have to enter in the module configuration.
+You can use the command line tool jq to filter the output
 
-The output will look something like this (searching for 'Erikslund'). Use the SiteId value as the stationid:
+```curl -X 'GET'   'https://transport.integration.sl.se/v1/sites?expand=false'   -H 'accept: application/json'   -H 'Accept-Encoding: identity' -H 'Content-Type: application/json' | jq -c '.[] | select(.name | contains("<station name>"))'```
 
-```
-{
-    "StatusCode": 0,
-    "Message": null,
-    "ExecutionTime": 0,
-    "ResponseData": [
-        {
-            "Name": "Erikslund (Täby)",
-            "SiteId": "2322",
-            "Type": "Station",
-            "X": "18044128",
-            "Y": "59464947"
-        },
-        {
-            "Name": "Erikslundsvägen (Täby)",
-            "SiteId": "2329",
-            "Type": "Station",
-            "X": "18054079",
-            "Y": "59462808"
-        },
-        ...
-```
+just replace <station name> with the desired stations name. This is a full case sensitive match. To find the station "Erikslund" you eith have to write in "Erikslund" as "erikslund" will not match or you try a partial match like "rikslun". It will probably deliver a list of stations from which it will be easy to chose the right one. 
+
+The id field is the staionid!
 
 ## Screenshot
 

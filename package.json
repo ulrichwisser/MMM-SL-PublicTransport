@@ -6,7 +6,6 @@
   "scripts": {
     "start": "..\\..\\node_modules\\electron\\dist\\electron.exe ..\\..\\js\\electron.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "station": "node findStation.js"
   },
   "repository": {
     "type": "git",
