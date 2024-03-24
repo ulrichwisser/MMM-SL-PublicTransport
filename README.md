@@ -1,7 +1,11 @@
 # MMM-SL-PublicTransport
-[Magic Mirror](https://magicmirror.builders/) Module - Display public transport in Stockholm/Sweden. This module use the API's provided by [Trafiklab](https://www.trafiklab.se/api).
+[Magic Mirror](https://magicmirror.builders/) Module - Display public transport in Stockholm/Sweden. 
+
+Updated 2024 to use the new SL Transport API provided by [Trafiklab](https://www.trafiklab.se).
 
 ![SL PublicTransport Module](docs/MMM-SL-Screenshot.PNG)
+
+Forked from https://github.com/boghammar/MMM-SL-PublicTransport
 
 ## Install
 1. Clone repository into ``../modules/`` inside your MagicMirror folder.
