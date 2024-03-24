@@ -1,7 +1,7 @@
 {
   "name": "mmm-sl-publictransport",
   "version": "1.0.0",
-  "description": "Get departures for a station using the SL API's (Stockholm/Sweden)",
+  "description": "Get departures for a station using the SL Transport API (Stockholm/Sweden)",
   "main": "index.js",
   "scripts": {
     "start": "..\\..\\node_modules\\electron\\dist\\electron.exe ..\\..\\js\\electron.js",
@@ -9,19 +9,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/boghammar/MMM-SL-PublicTransport.git"
+    "url": "git+https://github.com/ulrichwisser/MMM-SL-PublicTransport.git"
   },
   "keywords": [
     "magicmirror",
     "public transport",
     "Stockholm"
   ],
-  "author": "anders@boghammar.com",
+  "author": "ulrich@wisser.se (original author anders@boghammar.com)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/boghammar/MMM-SL-PublicTransport/issues"
+    "url": "https://github.com/ulrichwisser/MMM-SL-PublicTransport/issues"
   },
-  "homepage": "https://github.com/boghammar/MMM-SL-PublicTransport#readme",
+  "homepage": "https://github.com/ulrichwisser/MMM-SL-PublicTransport",
   "dependencies": {
     "https-proxy-agent": "^2.1.0",
     "lodash": "^4.17.11",
