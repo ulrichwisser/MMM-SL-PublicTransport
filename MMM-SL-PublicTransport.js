@@ -50,7 +50,7 @@ Module.register("MMM-SL-PublicTransport", {
     },
     // --------------------------------------- Define required stylesheets
     getStyles: function() {
-            return ["MMM-SL-PublicTransport.css", "font-awesome.css"];
+            return ["font-awesome.css"];
         },
     // --------------------------------------- Get header
     getHeader: function () {
